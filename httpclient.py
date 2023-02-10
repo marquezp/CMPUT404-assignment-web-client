@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
+# Copyright 2023 Jorge Marquez Peralta, Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ class HTTPClient(object):
         self.socket.connect((host, port))
         return None
 
+    # return the status code sent by the server
     def get_code(self, data):
         status_line = data.split("\r\n")[0]
         return int(status_line.split(" ")[1])
@@ -47,6 +48,7 @@ class HTTPClient(object):
     def get_headers(self,data):
         return None
 
+    # return the body of the server response
     def get_body(self, data):
         return data.split("\r\n")[-1]
     
@@ -73,9 +75,10 @@ class HTTPClient(object):
         if port == None:
             port = 80
 
+        # connect to the server and send the request
         self.connect(host, port)
         self.sendall(request)
-
+        # process the response
         response = self.recvall(self.socket)
         code = self.get_code(response)
         body = self.get_body(response)
@@ -85,14 +88,16 @@ class HTTPClient(object):
         print(code)
         print(body)
         return code, body
-        
+
 
     # Create a GET request
     def GET(self, url, args=None):
         # REQUEST LINE
         url_parsed = urllib.parse.urlparse(url)
+        # make sure its an http:// scheme
         if url_parsed.scheme != "http":
             raise Exception("Client only supports http scheme")
+            
         host = url_parsed.hostname
         port = url_parsed.port
         path = url_parsed.path if url_parsed.path else "/"
@@ -126,8 +131,10 @@ class HTTPClient(object):
     def POST(self, url, args=None):
         # CREATE REQUEST LINE
         url_parsed = urllib.parse.urlparse(url)
+        # make sure its an http:// scheme
         if url_parsed.scheme != "http":
             raise Exception("Client only supports http scheme")
+
         host = url_parsed.hostname
         port = url_parsed.port
         path = url_parsed.path if url_parsed.path else "/"
